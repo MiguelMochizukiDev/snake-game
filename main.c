@@ -39,13 +39,17 @@ int main(void) {
 
 	// Game over — show message and wait for any key before exiting so the
 	// player can see the final board.
-	print_message("Game Over! Press any key to exit...", game.board.height + 2);
+	print_message("Game Over! Press \"enter\" to exit...", game.board.height + 2);
 
-	// Wait for a keypress using existing terminal helpers
-	while (!kbhit()) {
-		usleep(100000);
-	}
-	getch(); // consume the key
+	// Wait specifically for Enter (newline or carriage return) before exiting.
+	// This consumes other keys until Enter is pressed.
+	int ch = 0;
+	do {
+		while (!kbhit()) {
+			usleep(100000);
+		}
+		ch = (unsigned char) getch();
+	} while (ch != '\n' && ch != '\r');
 
 	// Restore terminal modes and clean up ncurses
 	disable_raw_mode();
