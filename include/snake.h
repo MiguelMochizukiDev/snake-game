@@ -19,6 +19,7 @@ typedef struct {
 void init_snake(snake_t * snake);
 void draw_snake(board_t * board, snake_t * snake);
 void move_snake(snake_t * snake, board_t * board, int * running);
+void free_snake(snake_t * snake);
 
 #endif
 

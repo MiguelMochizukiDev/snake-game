@@ -10,6 +10,8 @@
 #define DELAY 200000
 
 int main(void) {
+	init_ncurses();
+
 	srand(time(NULL));
 	game_t game;
 	init_game(&game);
@@ -35,8 +37,30 @@ int main(void) {
 		usleep(DELAY);
 	}
 
+	// Game over — show message and wait for any key before exiting so the
+	// player can see the final board.
+	print_message("Game Over! Press any key to exit...", game.board.height + 2);
+
+	// Wait for a keypress using existing terminal helpers
+	while (!kbhit()) {
+		usleep(100000);
+	}
+	getch(); // consume the key
+
+	// Restore terminal modes and clean up ncurses
 	disable_raw_mode();
+
+	// Free heap allocations
+	free_snake(&game.snake);
+	free_board(&game.board);
+
+	cleanup_ncurses();
+
 	printf("Game Over!\n");
+
+	return 0;
+
+
 	return 0;
 }
 

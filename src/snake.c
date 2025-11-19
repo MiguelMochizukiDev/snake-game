@@ -115,3 +115,16 @@ void move_snake(snake_t * snake, board_t * board, int * running) {
 	}
 }
 
+void free_snake(snake_t *snake) {
+	if (!snake) return;
+	snake_node_t *cur = snake->head;
+	while (cur) {
+		snake_node_t *next = cur->next;
+		free(cur);
+		cur = next;
+	}
+	snake->head = NULL;
+	snake->tail = NULL;
+	snake->length = 0;
+}
+

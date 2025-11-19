@@ -13,7 +13,11 @@ typedef struct {
 	int food_y;
 } board_t;
 
+void init_ncurses();
 void init_board(board_t * board);
 void print_board(board_t * board);
+void free_board(board_t * board);
+void print_message(const char *msg, int line);
+void cleanup_ncurses();
 
 #endif
