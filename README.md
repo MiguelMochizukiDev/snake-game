@@ -37,7 +37,7 @@ snake_game/
 
 ## Compilation
 
-Use `gcc` to compile all source files and include the header directory:
+Use `gcc` to compile all source files and include the header directory. Ensure installing ncurses before compilling:
 
 ```bash
 gcc -o snake \
@@ -47,7 +47,7 @@ gcc -o snake \
   src/game.c \
   src/terminal.c \
   main.c \
-  -Wall -Wextra -pedantic
+  -Wall -Wextra -pedantic -lncurses
 ```
 
 This produces an executable named snake.
