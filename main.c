@@ -39,7 +39,13 @@ int main(void) {
 
 	// Game over — show message and wait for any key before exiting so the
 	// player can see the final board.
-	print_message("Game Over! Press \"enter\" to exit...", game.board.height + 2);
+	
+	// Save the best score to history if it's a new record
+	if (game.board.score == game.board.best_score && game.board.score > 0) {
+		save_score(game.board.best_score);
+	}
+	
+	print_message("Game Over! Press \"enter\" to exit...", game.board.height + 3);
 
 	// Wait specifically for Enter (newline or carriage return) before exiting.
 	// This consumes other keys until Enter is pressed.
@@ -55,15 +61,13 @@ int main(void) {
 	disable_raw_mode();
 
 	// Free heap allocations
-	free_snake(&game.snake);
-	free_board(&game.board);
 
 	cleanup_ncurses();
 
-	printf("Game Over!\n");
+	printf("Game Over! Final Score: %d\n", game.board.score);
 
-	return 0;
-
+	free_snake(&game.snake);
+	free_board(&game.board);
 
 	return 0;
 }

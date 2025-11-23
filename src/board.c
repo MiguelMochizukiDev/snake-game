@@ -17,6 +17,7 @@ void init_board(board_t *board) {
     board->height = HEIGHT;
     board->width = WIDTH;
     board->score = 0;
+    board->best_score = read_best_score();
 
     // allocate grid
     board->grid = (char **) malloc(sizeof(char *) * HEIGHT);
@@ -49,6 +50,7 @@ void print_board(board_t *board) {
 
     // Print score below the board and refresh to update the screen
     mvprintw(board->height + 1, 0, "Score: %d", board->score);
+    mvprintw(board->height + 2, 0, "Best Score: %d", board->best_score);
     refresh();
 }
 
@@ -69,10 +71,39 @@ void free_board(board_t *board) {
     board->height = 0;
     board->width = 0;
     board->score = 0;
+    board->best_score = 0;
 }
 
 void print_message(const char *msg, int line) {
     if (!msg) return;
     mvprintw(line, 0, "%s", msg);
     refresh();
+}
+
+int read_best_score() {
+    FILE *file = fopen("score_history.txt", "r");
+    if (!file) {
+        return 0; // No history file exists, return 0 as best score
+    }
+    
+    int score = 0;
+    char line[32];
+    
+    // Read the last line of the file
+    while (fgets(line, sizeof(line), file)) {
+        sscanf(line, "%d", &score);
+    }
+    
+    fclose(file);
+    return score;
+}
+
+void save_score(int score) {
+    FILE *file = fopen("score_history.txt", "a");
+    if (!file) {
+        return; // Could not open file for writing
+    }
+    
+    fprintf(file, "%d\n", score);
+    fclose(file);
 }

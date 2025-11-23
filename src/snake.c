@@ -69,6 +69,11 @@ void move_snake(snake_t * snake, board_t * board, int * running) {
 	if (new_x == board->food_x && new_y == board->food_y) {
 		grow = 1;
 		board->score++;
+		
+		// Update best score if current score is higher
+		if (board->score > board->best_score) {
+			board->best_score = board->score;
+		}
 
 		int fx, fy;
 		snake_node_t * check;
