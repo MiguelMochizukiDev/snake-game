@@ -11,8 +11,9 @@ This project demonstrates clean separation of concerns using headers and source 
 - Modular code: board, snake, game logic, and terminal I/O separated.
 - Real-time input (no need to press Enter).
 - Dynamic snake growth when eating food.
-- Score tracking.
+- Score tracking with persistent best score history.
 - Collision detection with walls and itself.
+- **Score History**: The game automatically saves your best scores to `score_history.txt` and displays your current best score during gameplay.
 
 ---
 
@@ -67,7 +68,16 @@ Control the snake with WASD keys:
 
 - D -> Right
 
-The game ends if the snake hits a wall or itself. Your score is displayed at the bottom of the board.
+The game ends if the snake hits a wall or itself. Your current score and best score are displayed at the bottom of the board.
+
+## Score History
+
+The game maintains a persistent score history in `score_history.txt`:
+- On startup, the game reads your previous best score from the history file
+- During gameplay, your best score is displayed alongside your current score
+- When you achieve a new high score, it becomes your new best score for that session
+- At the end of the game, if you set a new record, it's automatically saved to the history file
+- Each new record is appended as a new line in `score_history.txt`
 
 ## Notes
 
