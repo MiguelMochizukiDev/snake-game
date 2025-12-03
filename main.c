@@ -41,15 +41,15 @@ int main(void) {
 	/* Game over — show message and wait for any key before exiting so the
 	 * player can see the final board.
 	 */
-	
+
 	/* Save the final score to score history (every game) */
 	save_final_score(game.board.score);
-	
+
 	/* Save the best score to best_scores.txt if it's a new record */
 	if (game.board.score == game.board.best_score && game.board.score > 0) {
 		save_score(game.board.best_score);
 	}
-	
+
 	print_message("Game Over! Press \"enter\" to exit...", game.board.height + 3);
 
 	/* Wait specifically for Enter (newline or carriage return) before exiting.
@@ -63,17 +63,18 @@ int main(void) {
 		ch = (unsigned char) getch();
 	} while (ch != '\n' && ch != '\r');
 
-	/* Print final score before cleanup */
-	printf("Game Over! Final Score: %d\n", game.board.score);
 
 	/* Restore terminal modes and clean up ncurses */
 	disable_raw_mode();
 
+	cleanup_ncurses();
+
+	/* Print final score before cleanup */
+	printf("Game Over! Final Score: %d\n", game.board.score);
+
 	/* Free heap allocations */
 	free_snake(&game.snake);
 	free_board(&game.board);
-
-	cleanup_ncurses();
 
 	return 0;
 }
