@@ -76,12 +76,22 @@ void move_snake(snake_t * snake, board_t * board, int * running) {
 		}
 
 		int fx, fy;
+		int head_x = snake->head->x;
+		int head_y = snake->head->y;
+		int half_size = HEAD_NEIGHBORHOOD_SIZE / 2;
 		snake_node_t * check;
+		
 		do {
 			fx = rand() % (WIDTH - 2) + 1;
 			fy = rand() % (HEIGHT - 2) + 1;
 			
-			// Check collision with snake body
+			// First check neighborhood (faster than iterating through snake)
+			if (fx >= head_x - half_size && fx <= head_x + half_size &&
+			    fy >= head_y - half_size && fy <= head_y + half_size) {
+				continue; // Skip to next iteration
+			}
+			
+			// Then check collision with snake body
 			check = snake->head;
 			int collision = 0;
 			while (check) {
@@ -90,18 +100,6 @@ void move_snake(snake_t * snake, board_t * board, int * running) {
 					break;
 				}
 				check = check->next;
-			}
-			
-			// Check if food is in the neighborhood of snake's head
-			if (!collision) {
-				int head_x = snake->head->x;
-				int head_y = snake->head->y;
-				int half_size = HEAD_NEIGHBORHOOD_SIZE / 2;
-				
-				if (fx >= head_x - half_size && fx <= head_x + half_size &&
-				    fy >= head_y - half_size && fy <= head_y + half_size) {
-					collision = 1;
-				}
 			}
 			
 			if (!collision) break;
