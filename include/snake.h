@@ -3,6 +3,8 @@
 
 #include "board.h"
 
+#define HEAD_NEIGHBORHOOD_SIZE 5
+
 typedef struct snake_node {
 	int x;
 	int y;
