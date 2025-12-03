@@ -22,5 +22,6 @@ void print_message(const char *msg, int line);
 void cleanup_ncurses();
 int read_best_score();
 void save_score(int score);
+void save_final_score(int score);
 
 #endif

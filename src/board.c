@@ -81,7 +81,7 @@ void print_message(const char *msg, int line) {
 }
 
 int read_best_score() {
-    FILE *file = fopen("score_history.txt", "r");
+    FILE *file = fopen("best_scores.txt", "r");
     if (!file) {
         return 0; // No history file exists, return 0 as best score
     }
@@ -99,6 +99,16 @@ int read_best_score() {
 }
 
 void save_score(int score) {
+    FILE *file = fopen("best_scores.txt", "a");
+    if (!file) {
+        return; // Could not open file for writing
+    }
+    
+    fprintf(file, "%d\n", score);
+    fclose(file);
+}
+
+void save_final_score(int score) {
     FILE *file = fopen("score_history.txt", "a");
     if (!file) {
         return; // Could not open file for writing

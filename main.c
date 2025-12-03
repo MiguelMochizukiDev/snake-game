@@ -40,7 +40,10 @@ int main(void) {
 	// Game over — show message and wait for any key before exiting so the
 	// player can see the final board.
 	
-	// Save the best score to history if it's a new record
+	// Save the final score to score history (every game)
+	save_final_score(game.board.score);
+	
+	// Save the best score to best_scores.txt if it's a new record
 	if (game.board.score == game.board.best_score && game.board.score > 0) {
 		save_score(game.board.best_score);
 	}
