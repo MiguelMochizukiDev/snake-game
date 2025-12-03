@@ -3,28 +3,28 @@
 #include <ncurses.h>
 #include "board.h"
 
-// Separate function for ncurses setup
+/* Separate function for ncurses setup */
 void init_ncurses() {
     initscr();
     noecho();
     curs_set(0);
-    keypad(stdscr, TRUE); // Enable special keys like arrows
-    timeout(100); // Non-blocking input with 100ms timeout
+    keypad(stdscr, TRUE); /* Enable special keys like arrows */
+    timeout(100); /* Non-blocking input with 100ms timeout */
 }
 
-// Modified init_board without initscr()
+/* Initialize board with borders, empty spaces and load best score */
 void init_board(board_t *board) {
     board->height = HEIGHT;
     board->width = WIDTH;
     board->score = 0;
     board->best_score = read_best_score();
 
-    // allocate grid
+    /* Allocate grid memory */
     board->grid = (char **) malloc(sizeof(char *) * HEIGHT);
     for (int y = 0; y < HEIGHT; y++) {
         board->grid[y] = (char *) malloc(sizeof(char) * WIDTH);
         for (int x = 0; x < WIDTH; x++) {
-            if (x == 0 || x == WIDTH - 1 || y == 0 || y == HEIGHT - 1) {
+            if (x == 0 || x == (WIDTH - 1) || y == 0 || y == (HEIGHT - 1)) {
                 board->grid[y][x] = '#';
             } else {
                 board->grid[y][x] = ' ';
@@ -32,7 +32,7 @@ void init_board(board_t *board) {
         }
     }
 
-    // Place initial food
+    /* Place initial food at random position */
     int fx = rand() % (WIDTH - 2) + 1;
     int fy = rand() % (HEIGHT - 2) + 1;
     board->food_x = fx;
@@ -41,21 +41,21 @@ void init_board(board_t *board) {
 }
 
 void print_board(board_t *board) {
-    // Redraw entire grid (static borders + dynamic contents)
+    /* Redraw entire grid (static borders + dynamic contents) */
     for (int y = 0; y < board->height; y++) {
         for (int x = 0; x < board->width; x++) {
             mvaddch(y, x, board->grid[y][x]);
         }
     }
 
-    // Print score below the board and refresh to update the screen
+    /* Print scores below the board and refresh screen */
     mvprintw(board->height + 1, 0, "Score: %d", board->score);
     mvprintw(board->height + 2, 0, "Best Score: %d", board->best_score);
     refresh();
 }
 
 void cleanup_ncurses() {
-    endwin(); // Restores terminal to normal state
+    endwin(); /* Restore terminal to normal state */
 }
 
 void free_board(board_t *board) {
@@ -83,13 +83,13 @@ void print_message(const char *msg, int line) {
 int read_best_score() {
     FILE *file = fopen("best_scores.txt", "r");
     if (!file) {
-        return 0; // No history file exists, return 0 as best score
+        return 0; /* No history file exists, return 0 as best score */
     }
     
     int score = 0;
     char line[32];
     
-    // Read the last line of the file
+    /* Read the last line of the file */
     while (fgets(line, sizeof(line), file)) {
         sscanf(line, "%d", &score);
     }
@@ -101,7 +101,7 @@ int read_best_score() {
 void save_score(int score) {
     FILE *file = fopen("best_scores.txt", "a");
     if (!file) {
-        return; // Could not open file for writing
+        return; /* Could not open file for writing */
     }
     
     fprintf(file, "%d\n", score);
@@ -111,7 +111,7 @@ void save_score(int score) {
 void save_final_score(int score) {
     FILE *file = fopen("score_history.txt", "a");
     if (!file) {
-        return; // Could not open file for writing
+        return; /* Could not open file for writing */
     }
     
     fprintf(file, "%d\n", score);
