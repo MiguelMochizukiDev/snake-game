@@ -1,21 +1,23 @@
 # Snake Game in C
 
-A classic Snake game implemented in C, designed with a modular structure.  
-This project demonstrates clean separation of concerns using headers and source files for **board**, **snake**, **game**, and **terminal input handling**.
+A terminal-based implementation of the classic Snake game, written in C with a modular architecture. The codebase separates concerns across **board**, **snake**, **game logic**, and **terminal I/O** modules.
 
 ---
 
 ## Features
 
-- Terminal-based Snake game.
-- Modular code: board, snake, game logic, and terminal I/O separated.
-- Real-time input (no need to press Enter).
-- Dynamic snake growth when eating food.
-- Score tracking with persistent best score history.
-- Collision detection with walls and itself.
-- **Performance Optimizations**: Object pooling for consistent frame timing and reduced memory allocation overhead.
-- **Smart Food Placement**: Food never spawns within a 5x5 neighborhood of the snake's head.
-- **Score History**: The game automatically saves your best scores to `best_scores.txt` and displays your current best score during gameplay. Additionally, every final score is saved to `score_history.txt` for complete game tracking.
+* Terminal interface using ncurses
+* Modular project structure (board, snake, game, terminal input)
+* Real-time, non-blocking input
+* Dynamic snake growth
+* Collision detection (walls and self)
+* Score display with persistent best-score tracking
+* **Optimized performance** through object pooling and predictable frame timing
+* **Smart food placement** avoiding the 5×5 region around the snake’s head
+* Automatic logging of:
+
+  * Best scores (`best_scores.txt`)
+  * All game results (`score_history.txt`)
 
 ---
 
@@ -24,15 +26,15 @@ This project demonstrates clean separation of concerns using headers and source 
 ```bash
 snake_game/
 ├─ include/
-│ ├─ board.h
-│ ├─ snake.h
-│ ├─ game.h
-│ └─ terminal.h
+│  ├─ board.h
+│  ├─ snake.h
+│  ├─ game.h
+│  └─ terminal.h
 ├─ src/
-│ ├─ board.c
-│ ├─ snake.c
-│ ├─ game.c
-│ └─ terminal.c
+│  ├─ board.c
+│  ├─ snake.c
+│  ├─ game.c
+│  └─ terminal.c
 └─ main.c
 ```
 
@@ -40,7 +42,7 @@ snake_game/
 
 ## Compilation
 
-Use `gcc` to compile all source files and include the header directory. Ensure installing ncurses before compilling:
+Requires **gcc** and **ncurses**.
 
 ```bash
 gcc -o snake \
@@ -53,65 +55,66 @@ gcc -o snake \
   -Wall -Wextra -pedantic -lncurses
 ```
 
-This produces an executable named snake.
-Running the Game
+Run with:
 
 ```bash
 ./snake
 ```
 
-Control the snake with WASD keys:
+Controls (WASD):
 
-- W -> Up
+* **W**: Up
+* **S**: Down
+* **A**: Left
+* **D**: Right
 
-- S -> Down
+The game ends on collision with a wall or the snake’s body.
 
-- A -> Left
+---
 
-- D -> Right
+## Score Tracking
 
-The game ends if the snake hits a wall or itself. Your current score and best score are displayed at the bottom of the board.
+### `best_scores.txt`
 
-## Score History
+* Loaded on startup
+* Displays current best score during gameplay
+* Updated when a new session high score is achieved
+* New best scores are appended as separate entries
 
-The game maintains two types of score tracking:
+### `score_history.txt`
 
-### Best Scores (`best_scores.txt`)
-- On startup, the game reads your previous best score from `best_scores.txt`
-- During gameplay, your best score is displayed alongside your current score
-- When you achieve a new high score, it becomes your new best score for that session
-- At the end of the game, if you set a new record, it's automatically saved to `best_scores.txt`
-- Each new record is appended as a new line
+* Logs every final score
+* Provides full session history for progress or statistics
 
-### Complete Game History (`score_history.txt`)
-- Every final score from each game is saved to `score_history.txt`
-- This provides a complete log of all your game sessions
-- Useful for tracking your progress and game statistics over time
+---
 
-## Performance Features
-
-The game includes several optimizations for smooth, consistent gameplay:
+## Performance Optimizations
 
 ### Object Pooling
-- Pre-allocated memory pool for snake nodes eliminates malloc/free overhead
-- Consistent O(1) allocation time instead of variable memory allocation delays
-- Reduces memory fragmentation and improves cache locality
 
-### Smart Food Generation  
-- Food placement avoids a 5x5 neighborhood around the snake's head
-- Bounded generation algorithm with fallback prevents infinite loops
-- Ensures predictable timing for food placement
+* Pre-allocated snake node pool
+* Eliminates runtime allocation overhead
+* Improves memory locality and consistency
 
-### Frame Consistency
-- Eliminates stuttering from dynamic memory allocation
-- Predictable execution times for smooth user experience
-- Optimized collision detection with early exit conditions
+### Smart Food Generation
+
+* Avoids spawning food within a 5×5 region around the snake’s head
+* Bounded fallback strategy prevents timing spikes
+
+### Frame Stability
+
+* Avoids stuttering caused by dynamic allocation
+* Predictable update cycle and optimized collision checks
+
+---
 
 ## Notes
 
-- The game uses system("clear") to redraw the board. On Windows, replace it with system("cls").
+* Uses `system("clear")` to refresh the screen. On Windows, replace with `system("cls")`.
+* Memory management relies on `malloc`/`free`.
 
-- Memory management uses malloc and free.
+---
 
 ## License
-This project is under MIT License. For more information see [LICENSE](./LICENSE).
+
+This project is licensed under the MIT License. See [LICENSE](./LICENSE).
