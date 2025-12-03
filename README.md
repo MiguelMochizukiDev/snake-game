@@ -13,6 +13,8 @@ This project demonstrates clean separation of concerns using headers and source 
 - Dynamic snake growth when eating food.
 - Score tracking with persistent best score history.
 - Collision detection with walls and itself.
+- **Performance Optimizations**: Object pooling for consistent frame timing and reduced memory allocation overhead.
+- **Smart Food Placement**: Food never spawns within a 5x5 neighborhood of the snake's head.
 - **Score History**: The game automatically saves your best scores to `best_scores.txt` and displays your current best score during gameplay. Additionally, every final score is saved to `score_history.txt` for complete game tracking.
 
 ---
@@ -85,6 +87,25 @@ The game maintains two types of score tracking:
 - Every final score from each game is saved to `score_history.txt`
 - This provides a complete log of all your game sessions
 - Useful for tracking your progress and game statistics over time
+
+## Performance Features
+
+The game includes several optimizations for smooth, consistent gameplay:
+
+### Object Pooling
+- Pre-allocated memory pool for snake nodes eliminates malloc/free overhead
+- Consistent O(1) allocation time instead of variable memory allocation delays
+- Reduces memory fragmentation and improves cache locality
+
+### Smart Food Generation  
+- Food placement avoids a 5x5 neighborhood around the snake's head
+- Bounded generation algorithm with fallback prevents infinite loops
+- Ensures predictable timing for food placement
+
+### Frame Consistency
+- Eliminates stuttering from dynamic memory allocation
+- Predictable execution times for smooth user experience
+- Optimized collision detection with early exit conditions
 
 ## Notes
 
