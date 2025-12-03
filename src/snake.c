@@ -128,35 +128,44 @@ void move_snake(snake_t *snake, board_t *board, int *running) {
 		int attempts = 0;
 		const int MAX_ATTEMPTS = 100; /* Prevent infinite loops */
 		
+		/* Disable neighborhood restriction when snake is too long to avoid placement issues */
+		const int TOTAL_CELLS = (WIDTH - 2) * (HEIGHT - 2); /* Available playing area */
+		const int DISABLE_NEIGHBORHOOD_THRESHOLD = TOTAL_CELLS * 3 / 4; /* 75% of board filled */
+		int use_neighborhood = (snake->length < DISABLE_NEIGHBORHOOD_THRESHOLD);
+		
 		do {
 			fx = rand() % (WIDTH - 2) + 1;
 			fy = rand() % (HEIGHT - 2) + 1;
 			attempts++;
 			
-			/* First check neighborhood (faster than iterating through snake) */
-			if (fx >= (head_x - half_size) && fx <= (head_x + half_size) &&
+			/* Check neighborhood only if snake is not too long */
+			if (use_neighborhood &&
+			    fx >= (head_x - half_size) && fx <= (head_x + half_size) &&
 			    fy >= (head_y - half_size) && fy <= (head_y + half_size)) {
 				if (attempts >= MAX_ATTEMPTS) {
 					/* Fallback: place food at first valid position if we can't find random spot */
 					for (int y = 1; y < (HEIGHT - 1); y++) {
 						for (int x = 1; x < (WIDTH - 1); x++) {
-							if (!(x >= (head_x - half_size) && x <= (head_x + half_size) &&
-							      y >= (head_y - half_size) && y <= (head_y + half_size))) {
-								/* Check if position is free from snake */
-								check = snake->head;
-								int collision = 0;
-								while (check) {
-									if (check->x == x && check->y == y) {
-										collision = 1;
-										break;
-									}
-									check = check->next;
+							/* Skip neighborhood check in fallback if disabled */
+							if (use_neighborhood && 
+							    (x >= (head_x - half_size) && x <= (head_x + half_size) &&
+							     y >= (head_y - half_size) && y <= (head_y + half_size))) {
+								continue;
+							}
+							/* Check if position is free from snake */
+							check = snake->head;
+							int collision = 0;
+							while (check) {
+								if (check->x == x && check->y == y) {
+									collision = 1;
+									break;
 								}
-								if (!collision) {
-									fx = x;
-									fy = y;
-									goto food_placed;
-								}
+								check = check->next;
+							}
+							if (!collision) {
+								fx = x;
+								fy = y;
+								goto food_placed;
 							}
 						}
 					}
