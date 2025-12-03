@@ -99,7 +99,7 @@ int read_best_score() {
 }
 
 void save_score(int score) {
-    FILE *file = fopen("best_scores.txt", "a");
+    FILE *file = fopen("best_scores.txt", "w"); /* Use "w" to overwrite instead of append */
     if (!file) {
         return; /* Could not open file for writing */
     }
