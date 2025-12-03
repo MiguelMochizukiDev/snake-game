@@ -2,11 +2,53 @@
 #include <time.h>
 #include "snake.h"
 
+void init_node_pool(snake_t * snake) {
+	// Initialize the pool by linking all nodes together
+	for (int i = 0; i < NODE_POOL_SIZE - 1; i++) {
+		snake->node_pool[i].next = &snake->node_pool[i + 1];
+	}
+	snake->node_pool[NODE_POOL_SIZE - 1].next = NULL;
+	snake->free_nodes = &snake->node_pool[0];
+	snake->pool_initialized = 1;
+}
+
+snake_node_t * get_node_from_pool(snake_t * snake) {
+	if (!snake->pool_initialized) {
+		init_node_pool(snake);
+	}
+	
+	if (!snake->free_nodes) {
+		// Pool exhausted, fallback to malloc (shouldn't happen in normal play)
+		return (snake_node_t *) malloc(sizeof(snake_node_t));
+	}
+	
+	snake_node_t * node = snake->free_nodes;
+	snake->free_nodes = snake->free_nodes->next;
+	return node;
+}
+
+void return_node_to_pool(snake_t * snake, snake_node_t * node) {
+	if (!node) return;
+	
+	// Check if node is from pool (within pool memory range)
+	if (node >= snake->node_pool && node < snake->node_pool + NODE_POOL_SIZE) {
+		node->next = snake->free_nodes;
+		snake->free_nodes = node;
+	} else {
+		// Node was malloc'd, free it normally
+		free(node);
+	}
+}
+
 void init_snake(snake_t * snake) {
 	int x0 = WIDTH / 2;
 	int y0 = HEIGHT / 2;
 
-	snake_node_t * head = (snake_node_t *) malloc(sizeof(snake_node_t));
+	// Initialize object pool
+	snake->pool_initialized = 0;
+	init_node_pool(snake);
+
+	snake_node_t * head = get_node_from_pool(snake);
 	head->x = x0;
 	head->y = y0;
 	head->next = NULL;
@@ -18,7 +60,7 @@ void init_snake(snake_t * snake) {
 
 	snake_node_t * current = head;
 	for (int i = 1; i < 3; i++) {
-		snake_node_t * new_node = (snake_node_t *) malloc(sizeof(snake_node_t));
+		snake_node_t * new_node = get_node_from_pool(snake);
 		new_node->x = x0 - i;
 		new_node->y = y0;
 		new_node->next = NULL;
@@ -75,19 +117,48 @@ void move_snake(snake_t * snake, board_t * board, int * running) {
 			board->best_score = board->score;
 		}
 
+		// Optimized food generation with attempt limit to ensure consistent timing
 		int fx, fy;
 		int head_x = snake->head->x;
 		int head_y = snake->head->y;
 		int half_size = HEAD_NEIGHBORHOOD_SIZE / 2;
 		snake_node_t * check;
+		int attempts = 0;
+		const int MAX_ATTEMPTS = 100; // Prevent infinite loops
 		
 		do {
 			fx = rand() % (WIDTH - 2) + 1;
 			fy = rand() % (HEIGHT - 2) + 1;
+			attempts++;
 			
 			// First check neighborhood (faster than iterating through snake)
 			if (fx >= head_x - half_size && fx <= head_x + half_size &&
 			    fy >= head_y - half_size && fy <= head_y + half_size) {
+				if (attempts >= MAX_ATTEMPTS) {
+					// Fallback: place food at first valid position if we can't find random spot
+					for (int y = 1; y < HEIGHT - 1; y++) {
+						for (int x = 1; x < WIDTH - 1; x++) {
+							if (!(x >= head_x - half_size && x <= head_x + half_size &&
+							      y >= head_y - half_size && y <= head_y + half_size)) {
+								// Check if position is free from snake
+								check = snake->head;
+								int collision = 0;
+								while (check) {
+									if (check->x == x && check->y == y) {
+										collision = 1;
+										break;
+									}
+									check = check->next;
+								}
+								if (!collision) {
+									fx = x;
+									fy = y;
+									goto food_placed;
+								}
+							}
+						}
+					}
+				}
 				continue; // Skip to next iteration
 			}
 			
@@ -103,14 +174,16 @@ void move_snake(snake_t * snake, board_t * board, int * running) {
 			}
 			
 			if (!collision) break;
-		} while (1);
+		} while (attempts < MAX_ATTEMPTS);
+		
+		food_placed:
 
 		board->food_x = fx;
 		board->food_y = fy;
 		board->grid[fy][fx] = '*';
 	}
 
-	snake_node_t * new_head = (snake_node_t *) malloc(sizeof(snake_node_t));
+	snake_node_t * new_head = get_node_from_pool(snake);
 	new_head->x = new_x;
 	new_head->y = new_y;
 	new_head->next = snake->head;
@@ -125,7 +198,8 @@ void move_snake(snake_t * snake, board_t * board, int * running) {
 			current = current->next;
 		}
 		board->grid[snake->tail->y][snake->tail->x] = ' ';
-		free(snake->tail);
+		snake_node_t * old_tail = snake->tail;
+		return_node_to_pool(snake, old_tail);
 		snake->tail = current;
 		snake->tail->next = NULL;
 	} else if (grow) {
@@ -138,7 +212,7 @@ void free_snake(snake_t *snake) {
 	snake_node_t *cur = snake->head;
 	while (cur) {
 		snake_node_t *next = cur->next;
-		free(cur);
+		return_node_to_pool(snake, cur);
 		cur = next;
 	}
 	snake->head = NULL;
