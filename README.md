@@ -1,19 +1,19 @@
-# Snake Game in C
+# Snake Game
 
-A terminal-based implementation of the classic Snake game, written in C with a modular architecture. The codebase separates concerns across **board**, **snake**, **game logic**, and **terminal I/O** modules.
+A terminal-based implementation of the classic Snake game.
+
+Originally this project was written in C with a modular architecture. The codebase separated concerns across **board**, **snake**, **game logic**, and **terminal I/O** modules.
+
+Later it has been refactored in C++ following object-oriented paradigm, with three main classes: Board, Entity (modeling grids, food and snake segments) and GameController, which runs main logic.
 
 ---
 
 ## Features
 
-* Terminal interface using ncurses
-* Modular project structure (board, snake, game, terminal input)
+* Terminal interface
+* Object-oriented paradigm
 * Real-time, non-blocking input
-* Dynamic snake growth
-* Collision detection (walls and self)
-* Score display with persistent best-score tracking
-* **Optimized performance** through object pooling and predictable frame timing
-* **Smart food placement** avoiding the 5×5 region around the snake’s head
+* Dynamic snake growth (now with vector from STL)
 * Automatic logging of:
 
   * Best scores (`best_scores.txt`)
@@ -23,8 +23,10 @@ A terminal-based implementation of the classic Snake game, written in C with a m
 
 ## Project Structure
 
+### C Legacy
+
 ```bash
-snake_game/
+c_legacy/
 ├─ include/
 │  ├─ board.h
 │  ├─ snake.h
@@ -38,13 +40,47 @@ snake_game/
 └─ main.c
 ```
 
+### C++
+
+```bash
+cpp/
+├── best_scores.txt
+├── include
+│   ├── board.hpp
+│   ├── catch2
+│   │   └── catch.hpp
+│   ├── constants.hpp
+│   ├── entity.hpp
+│   ├── food.hpp
+│   ├── game_controller.hpp
+│   └── snake.hpp
+├── main.cpp
+├── Makefile
+├── score_history.txt
+├── snake
+├── src
+│   ├── board.cpp
+│   ├── food.cpp
+│   ├── game_controller.cpp
+│   └── snake.cpp
+├── test_integration
+├── tests
+│   ├── test_integration.cpp
+│   └── test_unit.cpp
+└── test_unit
+```
+
 ---
 
 ## Compilation
 
+### C Legacy
+
 Requires **gcc** and **ncurses**.
 
 ```bash
+cd c_legacy
+
 gcc -o snake \
   -Iinclude \
   src/board.c \
@@ -53,6 +89,21 @@ gcc -o snake \
   src/terminal.c \
   main.c \
   -Wall -Wextra -pedantic -lncurses
+```
+
+Run with:
+
+```bash
+./snake
+```
+
+### C++
+
+Requires **Make**.
+
+```bash
+cd cpp
+make snake
 ```
 
 Run with:
@@ -88,30 +139,27 @@ The game ends on collision with a wall or the snake’s body.
 
 ---
 
-## Performance Optimizations
+## New Features
 
-### Object Pooling
+### Automatic Memory Management
 
-* Pre-allocated snake node pool
-* Eliminates runtime allocation overhead
-* Improves memory locality and consistency
+Using smart pointers, the C++ version is far more memory safe than the latter C implementation.
 
-### Smart Food Generation
+### Polymorphis
 
-* Avoids spawning food within a 5×5 region around the snake’s head
-* Bounded fallback strategy prevents timing spikes
+The C++ version implements an abstract class Entity which models the grid_ attribute from Board, the segments_ attribute (vector of SnakeSegments, which is subclass of Entity) of Snake and and Food (as explicit subclass).
 
-### Frame Stability
+### Cross-Platform Support
 
-* Avoids stuttering caused by dynamic allocation
-* Predictable update cycle and optimized collision checks
+Using macros the C++ version is expected to run both on Windows and UNIX/Linux systems.
 
----
+### Unit and Integration Tests
+
+Using Catch2, we implement unit and integrated tests to C++ implementation.
 
 ## Notes
 
-* Uses `system("clear")` to refresh the screen. On Windows, replace with `system("cls")`.
-* Memory management relies on `malloc`/`free`.
+C++ version is still in development.
 
 ---
 
