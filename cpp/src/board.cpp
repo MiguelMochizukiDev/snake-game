@@ -7,14 +7,18 @@
 #include "snake.hpp"
 
 #include <iostream>
+#include <fstream>
+#include <string>
 
 Board::Board(int length, int height)
-	: length_(length), height_(height) {
+	: length_(length), height_(height), score_(0), bestScore_(0) {
 	grid_.resize(height_);
 
 	for (int y = 0; y < height_; y++) {
 		grid_[y].resize(length_, nullptr);
 	}
+
+	bestScore_ = readBestScore();
 
 	food_ = std::make_unique<Food>(this);
 	snake_ = std::make_unique<Snake>(this);
@@ -68,21 +72,84 @@ void Board::update(Direction direction) {
 	    snake_->getSegments().front()->getY() == food_->getY()) {
 		snake_->grow();
 		food_->spawn();
+		score_++;
+		if (score_ > bestScore_) {
+			bestScore_ = score_;
+		}
 	}
 
 	sync();
 }
 
 void Board::render() const {
+	for (int x = 0; x < length_ + 2; ++x) {
+		std::cout << "#";
+	}
+	std::cout << "\n";
+
 	for (int y = 0; y < height_; ++y) {
+		std::cout << "#";
 		for (int x = 0; x < length_; ++x) {
 			if (grid_[y][x] == nullptr)
-				std::cout << ".";
-			else if (grid_[y][x] == food_.get())
-				std::cout << "F";
+				std::cout << " ";
 			else
-				std::cout << "O";
+				std::cout << grid_[y][x]->symbol();
 		}
-		std::cout << "\n";
+		std::cout << "#\n";
 	}
+
+	for (int x = 0; x < length_ + 2; ++x) {
+		std::cout << "#";
+	}
+	std::cout << "\n";
+
+	std::cout << "Score: " << score_ << "\n";
+	std::cout << "Best Score: " << bestScore_ << "\n";
+}
+
+int Board::getScore() const {
+	return score_;
+}
+
+int Board::getBestScore() const {
+	return bestScore_;
+}
+
+int Board::readBestScore() {
+	std::ifstream file("best_scores.txt");
+	if (!file.is_open()) {
+		return 0;
+	}
+
+	int score = 0;
+	std::string line;
+	while (std::getline(file, line)) {
+		try {
+			score = std::stoi(line);
+		} catch (...) {
+		}
+	}
+
+	file.close();
+	return score;
+}
+
+void Board::saveBestScore(int score) {
+	std::ofstream file("best_scores.txt");
+	if (!file.is_open()) {
+		return;
+	}
+
+	file << score << "\n";
+	file.close();
+}
+
+void Board::saveFinalScore(int score) {
+	std::ofstream file("score_history.txt", std::ios::app);
+	if (!file.is_open()) {
+		return;
+	}
+
+	file << score << "\n";
+	file.close();
 }

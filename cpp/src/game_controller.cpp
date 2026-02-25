@@ -5,6 +5,7 @@
 #include "game_controller.hpp"
 
 #include <iostream>
+#include <string>
 #include <thread>
 #include <chrono>
 
@@ -80,7 +81,30 @@ void GameController::run() {
 		}
 	}
 
-	std::cout << "\nGame Over\n";
+	int finalScore = board_.getScore();
+	int bestScore = board_.getBestScore();
+
+	board_.saveFinalScore(finalScore);
+
+	if (finalScore == bestScore && finalScore > 0) {
+		board_.saveBestScore(bestScore);
+	}
+
+#ifdef _WIN32
+	system("cls");
+#else
+	system("clear");
+#endif
+	board_.render();
+
+	std::cout << "\nGame Over! Press \"enter\" to exit...\n";
+
+	restoreTerminal();
+
+	std::string line;
+	std::getline(std::cin, line);
+
+	std::cout << "Game Over! Final Score: " << finalScore << "\n";
 }
 
 void GameController::processInput() {

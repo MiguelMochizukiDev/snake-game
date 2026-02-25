@@ -97,6 +97,41 @@ public:
 	 */
 	bool isOccupied(int x, int y) const;
 
+	/**
+	 * Get current game score
+	 * Input: None
+	 * Output: Current score as integer
+	 */
+	int getScore() const;
+
+	/**
+	 * Get best score from previous games
+	 * Input: None
+	 * Output: Best score as integer
+	 */
+	int getBestScore() const;
+
+	/**
+	 * Read best score from file
+	 * Input: None
+	 * Output: Best score as integer, 0 if file doesn't exist
+	 */
+	int readBestScore();
+
+	/**
+	 * Save best score to file
+	 * Input: score - score value to save
+	 * Output: None (writes to file)
+	 */
+	void saveBestScore(int score);
+
+	/**
+	 * Save final score to history file
+	 * Input: score - score value to save
+	 * Output: None (appends to file)
+	 */
+	void saveFinalScore(int score);
+
 private:
 	int length_;                                   /* Board width in cells */
 	int height_;                                   /* Board height in cells */
@@ -104,4 +139,7 @@ private:
 
 	std::unique_ptr<Food> food_;                   /* Owned food entity */
 	std::unique_ptr<Snake> snake_;                 /* Owned snake entity */
+
+	int score_;                                    /* Current game score */
+	int bestScore_;                                /* Best score from previous games */
 };
