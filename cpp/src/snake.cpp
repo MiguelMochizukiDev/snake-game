@@ -76,16 +76,26 @@ void Snake::grow() {
 	int newY = tailY;
 
 	if (size > 1) {
+		/* Calculate direction from second-to-last to tail */
 		int prevX = segments_[size - 2]->getX();
 		int prevY = segments_[size - 2]->getY();
 
 		int dx = tailX - prevX;
 		int dy = tailY - prevY;
 
+		/* Extend in that direction */
 		newX = tailX + dx;
 		newY = tailY + dy;
+
+		/* Clamp to board boundaries to prevent out-of-bounds */
+		if (newX < 0) newX = 0;
+		if (newX >= board_->getLength()) newX = board_->getLength() - 1;
+		if (newY < 0) newY = 0;
+		if (newY >= board_->getHeight()) newY = board_->getHeight() - 1;
 	} else {
+		/* Single segment: try to place new segment to the left */
 		newX = tailX - 1;
+		if (newX < 0) newX = 0;  /* Clamp if at edge */
 	}
 
 	segments_.push_back(
