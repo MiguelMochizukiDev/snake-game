@@ -6,25 +6,28 @@
 
 #include "board.hpp"
 #include "input_handler.hpp"
+#include "irenderer.hpp"
 #include "constants.hpp"
 
 #include <memory>
 
 /**
  * Main game controller managing game loop, input, and rendering
- * Uses dependency injection for Board and InputHandler
+ * Uses dependency injection for Board, InputHandler, and Renderer
  * Input: None (class definition)
  * Output: None (class definition)
  */
 class GameController {
 public:
 	/**
-	 * Construct game controller with board and input handler
-	 * Input: board - shared pointer to Board, inputHandler - shared pointer to InputHandler
+	 * Construct game controller with board, input handler, and renderer
+	 * Input: board - shared pointer to Board, inputHandler - shared pointer to InputHandler,
+	 *        renderer - shared pointer to IRenderer
 	 * Output: None (constructor)
 	 */
 	GameController(std::shared_ptr<Board> board,
-	               std::shared_ptr<IInputHandler> inputHandler);
+	               std::shared_ptr<IInputHandler> inputHandler,
+	               std::shared_ptr<IRenderer> renderer);
 
 	/**
 	 * Destructor to restore terminal state
@@ -85,6 +88,7 @@ private:
 
 	std::shared_ptr<Board> board_;                  /* Game board instance */
 	std::shared_ptr<IInputHandler> inputHandler_;   /* Input handler strategy */
+	std::shared_ptr<IRenderer> renderer_;           /* Renderer strategy */
 	Direction direction_;                           /* Current snake movement direction */
 	bool running_;                                  /* Game running status flag */
 };

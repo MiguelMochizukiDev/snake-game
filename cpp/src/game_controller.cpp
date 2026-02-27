@@ -20,9 +20,11 @@
 #endif
 
 GameController::GameController(std::shared_ptr<Board> board,
-                               std::shared_ptr<IInputHandler> inputHandler)
+                               std::shared_ptr<IInputHandler> inputHandler,
+                               std::shared_ptr<IRenderer> renderer)
 	: board_(board),
 	  inputHandler_(inputHandler),
+	  renderer_(renderer),
 	  direction_(Direction::RIGHT),
 	  running_(true) {
 	setupTerminal();
@@ -92,12 +94,8 @@ void GameController::run() {
 		board_->saveBestScore(bestScore);
 	}
 
-#ifdef _WIN32
-	system("cls");
-#else
-	system("clear");
-#endif
-	board_->render();
+	renderer_->clear();
+	renderer_->render(*board_);
 
 	std::cout << "\nGame Over! Press \"enter\" to exit...\n";
 
@@ -122,10 +120,6 @@ void GameController::update() {
 }
 
 void GameController::render() {
-#ifdef _WIN32
-	system("cls");
-#else
-	system("clear");
-#endif
-	board_->render();
+	renderer_->clear();
+	renderer_->render(*board_);
 }

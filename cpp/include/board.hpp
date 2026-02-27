@@ -74,6 +74,13 @@ public:
 	std::vector<std::vector<Entity*>>& getGrid();
 
 	/**
+	 * Get const reference to the 2D grid of entity pointers
+	 * Input: None
+	 * Output: Const reference to grid vector
+	 */
+	const std::vector<std::vector<Entity*>>& getGrid() const;
+
+	/**
 	 * Synchronize entity positions with the grid representation
 	 * Input: None
 	 * Output: None (updates grid state)
@@ -86,13 +93,6 @@ public:
 	 * Output: None (modifies game state)
 	 */
 	void update(Direction direction);
-
-	/**
-	 * Render the current board state to terminal
-	 * Input: None
-	 * Output: None (updates terminal display)
-	 */
-	void render() const;
 
 	/**
 	 * Check if a grid cell is occupied by an entity (IBoard implementation)

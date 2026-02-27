@@ -37,6 +37,10 @@ std::vector<std::vector<Entity*>>& Board::getGrid() {
 	return grid_;
 }
 
+const std::vector<std::vector<Entity*>>& Board::getGrid() const {
+	return grid_;
+}
+
 bool Board::isOccupied(int x, int y) const {
 	if (x < 0 || x >= length_ || y < 0 || y >= height_)
 		return true;
@@ -77,32 +81,6 @@ void Board::update(Direction direction) {
 	}
 
 	sync();
-}
-
-void Board::render() const {
-	for (int x = 0; x < length_ + 2; ++x) {
-		std::cout << "#";
-	}
-	std::cout << "\n";
-
-	for (int y = 0; y < height_; ++y) {
-		std::cout << "#";
-		for (int x = 0; x < length_; ++x) {
-			if (grid_[y][x] == nullptr)
-				std::cout << " ";
-			else
-				std::cout << grid_[y][x]->symbol();
-		}
-		std::cout << "#\n";
-	}
-
-	for (int x = 0; x < length_ + 2; ++x) {
-		std::cout << "#";
-	}
-	std::cout << "\n";
-
-	std::cout << "Score: " << score_ << "\n";
-	std::cout << "Best Score: " << bestScore_ << "\n";
 }
 
 int Board::getScore() const {
