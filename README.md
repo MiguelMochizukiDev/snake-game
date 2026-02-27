@@ -4,7 +4,7 @@ A terminal-based implementation of the classic Snake game.
 
 Originally this project was written in C with a modular architecture. The codebase separated concerns across **board**, **snake**, **game logic**, and **terminal I/O** modules.
 
-Later it has been refactored in C++ following object-oriented paradigm, with three main classes: Board, Entity (modeling grids, food and snake segments) and GameController, which runs main logic.
+Later it has been refactored in C++ following object-oriented paradigm and **SOLID principles**, with dependency injection, interfaces for extensibility, and separation of concerns.
 
 ---
 
@@ -53,6 +53,9 @@ cpp/
 │   ├── entity.hpp
 │   ├── food.hpp
 │   ├── game_controller.hpp
+│   ├── iboard.hpp
+│   ├── input_handler.hpp
+│   ├── score_manager.hpp
 │   └── snake.hpp
 ├── main.cpp
 ├── Makefile
@@ -62,6 +65,8 @@ cpp/
 │   ├── board.cpp
 │   ├── food.cpp
 │   ├── game_controller.cpp
+│   ├── input_handler.cpp
+│   ├── score_manager.cpp
 │   └── snake.cpp
 ├── test_integration
 ├── tests
@@ -145,9 +150,19 @@ The game ends on collision with a wall or the snake’s body.
 
 Using smart pointers, the C++ version is far more memory safe than the latter C implementation.
 
-### Polymorphis
+### Polymorphism
 
 The C++ version implements an abstract class Entity which models the grid_ attribute from Board, the segments_ attribute (vector of SnakeSegments, which is subclass of Entity) of Snake and and Food (as explicit subclass).
+
+### SOLID Principles
+
+The C++ implementation follows SOLID design principles:
+
+* **Single Responsibility**: ScoreManager handles persistence, Board manages game state, InputHandler processes input
+* **Open/Closed**: New control schemes can be added via IInputHandler without modifying existing code
+* **Liskov Substitution**: Entity subclasses (SnakeSegment, Food) are fully substitutable
+* **Interface Segregation**: IBoard provides minimal interface with only essential methods
+* **Dependency Inversion**: Components depend on abstractions (IBoard, IInputHandler) rather than concrete implementations
 
 ### Cross-Platform Support
 
