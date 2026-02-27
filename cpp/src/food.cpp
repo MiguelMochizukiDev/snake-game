@@ -3,11 +3,10 @@
  */
 
 #include "food.hpp"
-#include "board.hpp"
 
 #include <cstdlib>
 
-Food::Food(Board* board) : board_(board), x_(-1), y_(-1) {}
+Food::Food(IBoard* board) : board_(board), x_(-1), y_(-1) {}
 
 int Food::getX() const { return x_; }
 int Food::getY() const { return y_; }

@@ -5,8 +5,7 @@
 #pragma once
 
 #include "entity.hpp"
-
-class Board;
+#include "iboard.hpp"
 
 /**
  * Food entity that can be consumed by the snake to grow
@@ -17,10 +16,10 @@ class Food : public Entity {
 public:
 	/**
 	 * Construct food on specified board
-	 * Input: board - pointer to game board
+	 * Input: board - pointer to IBoard interface
 	 * Output: None (constructor)
 	 */
-	explicit Food(Board* board);
+	explicit Food(IBoard* board);
 
 	/**
 	 * Get X coordinate of food
@@ -58,7 +57,7 @@ public:
 	void spawn();
 
 private:
-	Board* board_;   /* Pointer to game board */
+	IBoard* board_;  /* Pointer to board interface */
 	int x_;          /* X coordinate of food */
 	int y_;          /* Y coordinate of food */
 };

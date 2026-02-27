@@ -1,6 +1,6 @@
 CXX      = g++
 CXXFLAGS = -std=c++17 -Iinclude
-SRC      = src/board.cpp src/food.cpp src/game_controller.cpp src/snake.cpp
+SRC      = src/board.cpp src/food.cpp src/game_controller.cpp src/snake.cpp src/score_manager.cpp src/input_handler.cpp
 
 all: snake test_unit test_integration
 

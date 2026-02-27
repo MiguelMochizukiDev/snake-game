@@ -4,8 +4,10 @@
 
 #pragma once
 
+#include "iboard.hpp"
 #include "entity.hpp"
 #include "constants.hpp"
+#include "score_manager.hpp"
 
 #include <vector>
 #include <memory>
@@ -15,17 +17,19 @@ class Snake;
 
 /**
  * Game board class managing grid, snake, and food entities
+ * Implements IBoard interface for dependency inversion
  * Input: None (class definition)
  * Output: None (class definition)
  */
-class Board {
+class Board : public IBoard {
 public:
 	/**
-	 * Construct board with specified dimensions
-	 * Input: length - board width, height - board height
+	 * Construct board with specified dimensions and score manager
+	 * Input: length - board width, height - board height, scoreManager - score persistence handler
 	 * Output: None (constructor)
 	 */
-	Board(int length = Config::LENGTH, int height = Config::HEIGHT);
+	Board(int length = Config::LENGTH, int height = Config::HEIGHT,
+	      std::shared_ptr<ScoreManager> scoreManager = std::make_shared<ScoreManager>());
 
 	/**
 	 * Destructor to clean up board resources
@@ -35,18 +39,18 @@ public:
 	~Board();
 
 	/**
-	 * Get board width
+	 * Get board width (IBoard implementation)
 	 * Input: None
 	 * Output: Board length as integer
 	 */
-	int getLength() const;
+	int getLength() const override;
 
 	/**
-	 * Get board height
+	 * Get board height (IBoard implementation)
 	 * Input: None
 	 * Output: Board height as integer
 	 */
-	int getHeight() const;
+	int getHeight() const override;
 
 	/**
 	 * Get pointer to food entity
@@ -91,11 +95,11 @@ public:
 	void render() const;
 
 	/**
-	 * Check if a grid cell is occupied by an entity
+	 * Check if a grid cell is occupied by an entity (IBoard implementation)
 	 * Input: x - X coordinate, y - Y coordinate
 	 * Output: true if occupied, false otherwise
 	 */
-	bool isOccupied(int x, int y) const;
+	bool isOccupied(int x, int y) const override;
 
 	/**
 	 * Get current game score
@@ -112,23 +116,16 @@ public:
 	int getBestScore() const;
 
 	/**
-	 * Read best score from file
-	 * Input: None
-	 * Output: Best score as integer, 0 if file doesn't exist
-	 */
-	int readBestScore();
-
-	/**
-	 * Save best score to file
+	 * Save best score using score manager
 	 * Input: score - score value to save
-	 * Output: None (writes to file)
+	 * Output: None (delegates to ScoreManager)
 	 */
 	void saveBestScore(int score);
 
 	/**
-	 * Save final score to history file
+	 * Save final score to history using score manager
 	 * Input: score - score value to save
-	 * Output: None (appends to file)
+	 * Output: None (delegates to ScoreManager)
 	 */
 	void saveFinalScore(int score);
 
@@ -142,4 +139,6 @@ private:
 
 	int score_;                                    /* Current game score */
 	int bestScore_;                                /* Best score from previous games */
+
+	std::shared_ptr<ScoreManager> scoreManager_;   /* Score persistence handler */
 };

@@ -5,21 +5,26 @@
 #pragma once
 
 #include "board.hpp"
+#include "input_handler.hpp"
 #include "constants.hpp"
+
+#include <memory>
 
 /**
  * Main game controller managing game loop, input, and rendering
+ * Uses dependency injection for Board and InputHandler
  * Input: None (class definition)
  * Output: None (class definition)
  */
 class GameController {
 public:
 	/**
-	 * Construct game controller with board dimensions
-	 * Input: width - board width, height - board height
+	 * Construct game controller with board and input handler
+	 * Input: board - shared pointer to Board, inputHandler - shared pointer to InputHandler
 	 * Output: None (constructor)
 	 */
-	GameController(int width = Config::LENGTH, int height = Config::HEIGHT);
+	GameController(std::shared_ptr<Board> board,
+	               std::shared_ptr<IInputHandler> inputHandler);
 
 	/**
 	 * Destructor to restore terminal state
@@ -78,7 +83,8 @@ private:
 	 */
 	bool readInput(char& c);
 
-	Board board_;              /* Game board instance */
-	Direction direction_;      /* Current snake movement direction */
-	bool running_;             /* Game running status flag */
+	std::shared_ptr<Board> board_;                  /* Game board instance */
+	std::shared_ptr<IInputHandler> inputHandler_;   /* Input handler strategy */
+	Direction direction_;                           /* Current snake movement direction */
+	bool running_;                                  /* Game running status flag */
 };

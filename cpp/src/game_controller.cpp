@@ -19,8 +19,10 @@
 	static int originalFlags;
 #endif
 
-GameController::GameController(int width, int height)
-	: board_(width, height),
+GameController::GameController(std::shared_ptr<Board> board,
+                               std::shared_ptr<IInputHandler> inputHandler)
+	: board_(board),
+	  inputHandler_(inputHandler),
 	  direction_(Direction::RIGHT),
 	  running_(true) {
 	setupTerminal();
@@ -81,13 +83,13 @@ void GameController::run() {
 		}
 	}
 
-	int finalScore = board_.getScore();
-	int bestScore = board_.getBestScore();
+	int finalScore = board_->getScore();
+	int bestScore = board_->getBestScore();
 
-	board_.saveFinalScore(finalScore);
+	board_->saveFinalScore(finalScore);
 
 	if (finalScore == bestScore && finalScore > 0) {
-		board_.saveBestScore(bestScore);
+		board_->saveBestScore(bestScore);
 	}
 
 #ifdef _WIN32
@@ -95,7 +97,7 @@ void GameController::run() {
 #else
 	system("clear");
 #endif
-	board_.render();
+	board_->render();
 
 	std::cout << "\nGame Over! Press \"enter\" to exit...\n";
 
@@ -111,15 +113,12 @@ void GameController::processInput() {
 	char c;
 
 	if (readInput(c)) {
-		if ((c == 'w' || c == 'W') && direction_ != Direction::DOWN)  direction_ = Direction::UP;
-		if ((c == 's' || c == 'S') && direction_ != Direction::UP)    direction_ = Direction::DOWN;
-		if ((c == 'a' || c == 'A') && direction_ != Direction::RIGHT) direction_ = Direction::LEFT;
-		if ((c == 'd' || c == 'D') && direction_ != Direction::LEFT)  direction_ = Direction::RIGHT;
+		direction_ = inputHandler_->processInput(c, direction_);
 	}
 }
 
 void GameController::update() {
-	board_.update(direction_);
+	board_->update(direction_);
 }
 
 void GameController::render() {
@@ -128,5 +127,5 @@ void GameController::render() {
 #else
 	system("clear");
 #endif
-	board_.render();
+	board_->render();
 }

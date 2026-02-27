@@ -5,12 +5,11 @@
 #pragma once
 
 #include "entity.hpp"
+#include "iboard.hpp"
 #include "constants.hpp"
 
 #include <vector>
 #include <memory>
-
-class Board;
 
 /**
  * Single segment of the snake body, inherits from Entity
@@ -68,10 +67,10 @@ class Snake {
 public:
 	/**
 	 * Construct snake on specified board
-	 * Input: board - pointer to game board
+	 * Input: board - pointer to IBoard interface
 	 * Output: None (constructor)
 	 */
-	explicit Snake(Board* board);
+	explicit Snake(IBoard* board);
 
 	/**
 	 * Move snake in specified direction, handle collisions
@@ -95,6 +94,6 @@ public:
 	const std::vector<std::unique_ptr<SnakeSegment>>& getSegments() const;
 
 private:
-	Board* board_;                                          /* Pointer to game board */
+	IBoard* board_;                                         /* Pointer to board interface */
 	std::vector<std::unique_ptr<SnakeSegment>> segments_;   /* Snake body segments */
 };

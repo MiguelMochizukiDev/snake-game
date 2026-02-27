@@ -7,18 +7,16 @@
 #include "snake.hpp"
 
 #include <iostream>
-#include <fstream>
-#include <string>
 
-Board::Board(int length, int height)
-	: length_(length), height_(height), score_(0), bestScore_(0) {
+Board::Board(int length, int height, std::shared_ptr<ScoreManager> scoreManager)
+	: length_(length), height_(height), score_(0), bestScore_(0), scoreManager_(scoreManager) {
 	grid_.resize(height_);
 
 	for (int y = 0; y < height_; y++) {
 		grid_[y].resize(length_, nullptr);
 	}
 
-	bestScore_ = readBestScore();
+	bestScore_ = scoreManager_->readBestScore();
 
 	food_ = std::make_unique<Food>(this);
 	snake_ = std::make_unique<Snake>(this);
@@ -115,41 +113,10 @@ int Board::getBestScore() const {
 	return bestScore_;
 }
 
-int Board::readBestScore() {
-	std::ifstream file("best_scores.txt");
-	if (!file.is_open()) {
-		return 0;
-	}
-
-	int score = 0;
-	std::string line;
-	while (std::getline(file, line)) {
-		try {
-			score = std::stoi(line);
-		} catch (...) {
-		}
-	}
-
-	file.close();
-	return score;
-}
-
 void Board::saveBestScore(int score) {
-	std::ofstream file("best_scores.txt");
-	if (!file.is_open()) {
-		return;
-	}
-
-	file << score << "\n";
-	file.close();
+	scoreManager_->saveBestScore(score);
 }
 
 void Board::saveFinalScore(int score) {
-	std::ofstream file("score_history.txt", std::ios::app);
-	if (!file.is_open()) {
-		return;
-	}
-
-	file << score << "\n";
-	file.close();
+	scoreManager_->saveFinalScore(score);
 }

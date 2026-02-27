@@ -3,7 +3,6 @@
  */
 
 #include "snake.hpp"
-#include "board.hpp"
 
 #include <stdexcept>
 
@@ -19,7 +18,7 @@ void SnakeSegment::setPosition(int x, int y) {
 
 char SnakeSegment::symbol() const { return 'O'; }
 
-Snake::Snake(Board* board) : board_(board) {
+Snake::Snake(IBoard* board) : board_(board) {
 	int startX = board_->getLength() / 2;
 	int startY = board_->getHeight() / 2;
 
