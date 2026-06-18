@@ -8,13 +8,11 @@
 #include "iboard.hpp"
 #include "constants.hpp"
 
-#include <vector>
+#include <deque>
 #include <memory>
 
 /**
  * Single segment of the snake body, inherits from Entity
- * Input: None (class definition)
- * Output: None (class definition)
  */
 class SnakeSegment : public Entity {
 public:
@@ -59,9 +57,8 @@ private:
 };
 
 /**
- * Snake entity containing linked segments and movement logic
- * Input: None (class definition)
- * Output: None (class definition)
+ * Snake entity containing deque of segments and movement logic
+ * Uses std::deque for O(1) head insertion and tail removal
  */
 class Snake {
 public:
@@ -73,27 +70,51 @@ public:
 	explicit Snake(IBoard* board);
 
 	/**
-	 * Move snake in specified direction, handle collisions
-	 * Input: direction - movement direction
-	 * Output: None (modifies snake position)
-	 */
-	void move(Direction direction);
+	* Move snake in specified direction, handle collisions and food
+	* Input: direction - movement direction
+	*        foodX, foodY - current food position
+	* Output: Returns true if food was eaten (grow mode), false otherwise
+	*         Throws runtime_error on collision
+	*/
+	bool move(Direction direction, int foodX, int foodY);
 
 	/**
-	 * Grow snake by adding a new segment at the tail
+	 * Mark snake to grow on next move (food was eaten)
 	 * Input: None
-	 * Output: None (adds segment to snake)
+	 * Output: None (sets internal flag)
 	 */
-	void grow();
+	void setGrow();
 
 	/**
-	 * Get const reference to snake segments vector
+	 * Get const reference to snake segments deque
 	 * Input: None
-	 * Output: Const reference to segments vector
+	 * Output: Const reference to segments deque
 	 */
-	const std::vector<std::unique_ptr<SnakeSegment>>& getSegments() const;
+	const std::deque<std::unique_ptr<SnakeSegment>>& getSegments() const;
+
+	/**
+	 * Get pointer to head segment
+	 * Input: None
+	 * Output: Pointer to head segment, nullptr if empty
+	 */
+	const SnakeSegment* getHead() const;
+
+	/**
+	 * Get pointer to tail segment
+	 * Input: None
+	 * Output: Pointer to tail segment, nullptr if empty
+	 */
+	const SnakeSegment* getTail() const;
+
+	/**
+	 * Get current snake length
+	 * Input: None
+	 * Output: Number of segments
+	 */
+	size_t getLength() const;
 
 private:
 	IBoard* board_;                                         /* Pointer to board interface */
-	std::vector<std::unique_ptr<SnakeSegment>> segments_;   /* Snake body segments */
+	std::deque<std::unique_ptr<SnakeSegment>> segments_;   /* Snake body segments (deque for O(1) ops) */
+	bool shouldGrow_;                                       /* Flag to grow on next move */
 };

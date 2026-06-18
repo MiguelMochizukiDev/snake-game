@@ -61,18 +61,22 @@ void Board::sync() {
 	}
 
 	for (const auto& seg : snake_->getSegments()) {
-		grid_[seg->getY()][seg->getX()] = seg.get();
+		if (seg->getX() >= 0 && seg->getX() < length_ &&
+		    seg->getY() >= 0 && seg->getY() < height_) {
+			grid_[seg->getY()][seg->getX()] = seg.get();
+		}
 	}
 
-	grid_[food_->getY()][food_->getX()] = food_.get();
+	if (food_->getX() >= 0 && food_->getX() < length_ &&
+	    food_->getY() >= 0 && food_->getY() < height_) {
+		grid_[food_->getY()][food_->getX()] = food_.get();
+	}
 }
 
 void Board::update(Direction direction) {
-	snake_->move(direction);
+	bool foodEaten = snake_->move(direction, food_->getX(), food_->getY());
 
-	if (snake_->getSegments().front()->getX() == food_->getX() &&
-	    snake_->getSegments().front()->getY() == food_->getY()) {
-		snake_->grow();
+	if (foodEaten) {
 		food_->spawn();
 		score_++;
 		if (score_ > bestScore_) {
