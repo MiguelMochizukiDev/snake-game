@@ -13,6 +13,8 @@ Food::Food(IBoard* board) : board_(board) {
 	/* Don't spawn here - let Board handle it after full initialization */
 }
 
+EntityType Food::getType() const { return EntityType::FOOD; }
+
 void Food::spawn() {
 	Board* board = dynamic_cast<Board*>(board_);
 	if (!board) return;
@@ -28,16 +30,8 @@ void Food::spawn() {
 		y_ = std::rand() % board->getHeight();
 		attempts++;
 
-		/* Check if position is occupied by snake */
-		bool occupied = false;
-		for (auto& seg : snake->getSegments()) {
-			if (seg->getX() == x_ && seg->getY() == y_) {
-				occupied = true;
-				break;
-			}
-		}
-
-		if (!occupied) {
+		/* Use board->isOccupied (now O(1) via grid) */
+		if (!board->isOccupied(x_, y_)) {
 			break;
 		}
 
@@ -47,14 +41,7 @@ void Food::spawn() {
 	if (attempts >= MAX_ATTEMPTS) {
 		for (int y = 0; y < board->getHeight() && attempts >= MAX_ATTEMPTS; ++y) {
 			for (int x = 0; x < board->getLength() && attempts >= MAX_ATTEMPTS; ++x) {
-				bool occupied = false;
-				for (auto& seg : snake->getSegments()) {
-					if (seg->getX() == x && seg->getY() == y) {
-						occupied = true;
-						break;
-					}
-				}
-				if (!occupied) {
+				if (!board->isOccupied(x, y)) {
 					x_ = x;
 					y_ = y;
 					attempts = 0;

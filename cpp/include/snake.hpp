@@ -1,5 +1,6 @@
 /**
  * snake.hpp
+ * Snake implementation using std::deque for O(1) push_front/pop_back operations
  */
 
 #pragma once
@@ -51,6 +52,13 @@ public:
 	 */
 	char symbol() const override;
 
+	/**
+	 * Get entity type (returns SNAKE_SEGMENT)
+	 * Input: None
+	 * Output: EntityType::SNAKE_SEGMENT
+	 */
+	EntityType getType() const override;
+
 private:
 	int x_;    /* X coordinate of segment */
 	int y_;    /* Y coordinate of segment */
@@ -59,6 +67,7 @@ private:
 /**
  * Snake entity containing deque of segments and movement logic
  * Uses std::deque for O(1) head insertion and tail removal
+ * Much faster than std::vector for snake movement pattern
  */
 class Snake {
 public:

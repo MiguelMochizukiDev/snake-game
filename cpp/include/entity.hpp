@@ -5,6 +5,16 @@
 #pragma once
 
 /**
+ * Enumeration of entity types for fast type checking
+ * Input: None (enum definition)
+ * Output: None (enum definition)
+ */
+enum class EntityType {
+    SNAKE_SEGMENT,
+    FOOD
+};
+
+/**
  * Abstract base class for all game entities (snake segments, food)
  * Input: None (class definition)
  * Output: None (class definition)
@@ -38,6 +48,13 @@ public:
 	 * Output: Character symbol for display
 	 */
 	virtual char symbol() const = 0;
+
+	/**
+	 * Get the type of this entity (for fast RTTI replacement)
+	 * Input: None
+	 * Output: EntityType enum value
+	 */
+	virtual EntityType getType() const = 0;
 
 	/**
 	 * Virtual destructor for proper polymorphic cleanup

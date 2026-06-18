@@ -50,6 +50,13 @@ public:
 	char symbol() const override;
 
 	/**
+	 * Get entity type (returns FOOD)
+	 * Input: None
+	 * Output: EntityType::FOOD
+	 */
+	EntityType getType() const override;
+
+	/**
 	 * Spawn food at random unoccupied position on board
 	 * Input: None
 	 * Output: None (modifies food position)

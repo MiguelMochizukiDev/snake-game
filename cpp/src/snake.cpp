@@ -20,6 +20,8 @@ void SnakeSegment::setPosition(int x, int y) {
 
 char SnakeSegment::symbol() const { return 'O'; }
 
+EntityType SnakeSegment::getType() const { return EntityType::SNAKE_SEGMENT; }
+
 /* Snake implementation */
 Snake::Snake(IBoard* board) : board_(board), shouldGrow_(false) {
 	int startX = board_->getLength() / 2;

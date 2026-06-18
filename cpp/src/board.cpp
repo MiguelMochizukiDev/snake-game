@@ -45,21 +45,19 @@ bool Board::isOccupied(int x, int y) const {
 	if (x < 0 || x >= length_ || y < 0 || y >= height_)
 		return true;
 
-	for (const auto& seg : snake_->getSegments()) {
-		if (seg->getX() == x && seg->getY() == y)
-			return true;
-	}
-
-	return false;
+	/* O(1) access to grid */
+	return grid_[y][x] != nullptr;
 }
 
 void Board::sync() {
+	/* Clear grid */
 	for (auto& row : grid_) {
 		for (auto& cell : row) {
 			cell = nullptr;
 		}
 	}
 
+	/* Place snake segments */
 	for (const auto& seg : snake_->getSegments()) {
 		if (seg->getX() >= 0 && seg->getX() < length_ &&
 		    seg->getY() >= 0 && seg->getY() < height_) {
@@ -67,6 +65,7 @@ void Board::sync() {
 		}
 	}
 
+	/* Place food */
 	if (food_->getX() >= 0 && food_->getX() < length_ &&
 	    food_->getY() >= 0 && food_->getY() < height_) {
 		grid_[food_->getY()][food_->getX()] = food_.get();
@@ -76,15 +75,18 @@ void Board::sync() {
 void Board::update(Direction direction) {
 	bool foodEaten = snake_->move(direction, food_->getX(), food_->getY());
 
+	/* Update grid with new snake position BEFORE spawning food */
+	sync();
+
 	if (foodEaten) {
-		food_->spawn();
+		food_->spawn();   /* isOccupied now sees the snake via grid */
 		score_++;
 		if (score_ > bestScore_) {
 			bestScore_ = score_;
 		}
+		/* Sync again to place food on grid */
+		sync();
 	}
-
-	sync();
 }
 
 int Board::getScore() const {
