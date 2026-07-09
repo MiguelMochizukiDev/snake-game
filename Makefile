@@ -1,10 +1,9 @@
 # Snake Game Makefile
 # Author: Miguel Mochizuki Silva
-# Description: Makefile to orchestrate CMake build process
+# Description: Makefile to orchestrate CMake and Docker build processes
 
 # Directories
 BUILD_DIR = build
-BIN_DIR = bin
 DATA_DIR = data
 
 # CMake options
@@ -12,23 +11,26 @@ CMAKE = cmake
 CMAKE_BUILD_TYPE ?= Release
 CMAKE_FLAGS = -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE)
 
-# Executable path (CMake puts it in build/bin by default)
+# Docker options
+DOCKER_IMAGE = snake-game
+DOCKER_CONTAINER = snake-game-container
+
+# Executable path
 EXECUTABLE = $(BUILD_DIR)/bin/snake
 
-# Colors for help output
+# Colors
 GREEN = \033[0;32m
 BLUE = \033[0;34m
 YELLOW = \033[0;33m
 RED = \033[0;31m
 NC = \033[0m
 
-# Default target
-.PHONY: all
-all: build-local
+# ==============================
+# Local targets
+# ==============================
 
-# Build local - Configure and build with CMake
-.PHONY: build-local
-build-local:
+.PHONY: local
+local:
 	@echo "$(BLUE)Configuring CMake...$(NC)"
 	@mkdir -p $(BUILD_DIR)
 	@cd $(BUILD_DIR) && $(CMAKE) $(CMAKE_FLAGS) ..
@@ -37,41 +39,65 @@ build-local:
 	@echo "$(GREEN)Build complete!$(NC)"
 	@echo "$(GREEN)Executable: $(EXECUTABLE)$(NC)"
 
-# Run local - Build and run the game
 .PHONY: run-local
-run-local: build-local
+run-local: local
 	@echo "$(GREEN)Running Snake Game...$(NC)"
 	@$(EXECUTABLE)
 
-# Clean local - Remove build artifacts
 .PHONY: clean-local
 clean-local:
 	@echo "$(YELLOW)Cleaning build files...$(NC)"
-	@rm -rf $(BUILD_DIR) $(BIN_DIR)
+	@rm -rf $(BUILD_DIR)
 	@echo "$(YELLOW)Clean complete!$(NC)"
 
-# Rebuild local - Clean and rebuild
 .PHONY: rebuild-local
-rebuild-local: clean-local build-local
+rebuild-local: clean-local local
 
-# Help target
+# ==============================
+# Docker targets
+# ==============================
+
+.PHONY: docker
+docker:
+	@echo "$(BLUE)Building Docker image...$(NC)"
+	@docker build -t $(DOCKER_IMAGE) .
+	@echo "$(GREEN)Docker image built: $(DOCKER_IMAGE)$(NC)"
+
+.PHONY: run-docker
+run-docker: docker
+	@echo "$(GREEN)Running Snake Game in Docker with persistent scores...$(NC)"
+	@mkdir -p $(DATA_DIR)
+	@docker run --rm -it \
+		-v $(PWD)/$(DATA_DIR):/app/data \
+		--name $(DOCKER_CONTAINER) \
+		$(DOCKER_IMAGE)
+
+.PHONY: clean-docker
+clean-docker:
+	@echo "$(YELLOW)Cleaning Docker...$(NC)"
+	@docker rm -f $(DOCKER_CONTAINER) 2>/dev/null || true
+	@docker rmi -f $(DOCKER_IMAGE) 2>/dev/null || true
+	@echo "$(YELLOW)Docker clean complete!$(NC)"
+
+.PHONY: rebuild-docker
+rebuild-docker: clean-docker docker
+
+# ==============================
+# Help
+# ==============================
+
 .PHONY: help
 help:
 	@echo "$(GREEN)Snake Game - Makefile Options$(NC)"
 	@echo ""
-	@echo "$(BLUE)Available targets:$(NC)"
-	@echo "  $(GREEN)make build-local$(NC)    - Configure and build the game using CMake"
-	@echo "  $(GREEN)make run-local$(NC)      - Build and run the game"
-	@echo "  $(GREEN)make clean-local$(NC)    - Remove build directory and executable"
-	@echo "  $(GREEN)make rebuild-local$(NC)  - Clean and rebuild the game"
-	@echo "  $(GREEN)make help$(NC)           - Show this help message"
+	@echo "$(BLUE)Local targets:$(NC)"
+	@echo "  make local          - Build the game locally"
+	@echo "  make run-local      - Build and run the game locally"
+	@echo "  make clean-local    - Remove build files"
+	@echo "  make rebuild-local  - Clean and rebuild locally"
 	@echo ""
-	@echo "$(BLUE)Build options:$(NC)"
-	@echo "  $(YELLOW)CMAKE_BUILD_TYPE=$(NC)   - Build type (Release, Debug, etc.)"
-	@echo ""
-	@echo "$(BLUE)Example usage:$(NC)"
-	@echo "  $(YELLOW)make build-local$(NC)    - Build the game"
-	@echo "  $(YELLOW)make run-local$(NC)      - Play the game"
-	@echo "  $(YELLOW)make rebuild-local$(NC)  - Rebuild after changes"
-	@echo "  $(YELLOW)make clean-local$(NC)    - Clean build files"
-	@echo ""
+	@echo "$(BLUE)Docker targets:$(NC)"
+	@echo "  make docker         - Build Docker image"
+	@echo "  make run-docker     - Build and run in Docker (with persistence)"
+	@echo "  make clean-docker   - Remove Docker image and containers"
+	@echo "  make rebuild-docker - Clean and rebuild Docker image"
