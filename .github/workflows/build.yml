@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:          # ADICIONE ESTA SEÇÃO
+      - 'v*'       # Roda para tags que começam com 'v'
   pull_request:
   workflow_dispatch:
 
