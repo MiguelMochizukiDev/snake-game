@@ -33,13 +33,13 @@ jobs:
           - name: Windows x86-64
             runs-on: windows-2022
             artifact-name: snake-windows-x86_64
-            binary-path: build\\Release\\snake.exe
+            binary-path: build/Release/snake.exe
             cmake-generator: Visual Studio 17 2022
             cmake-arch: x64
           - name: Windows ARM64
             runs-on: windows-2022
             artifact-name: snake-windows-arm64
-            binary-path: build\\Release\\snake.exe
+            binary-path: build/Release/snake.exe
             cmake-generator: Visual Studio 17 2022
             cmake-arch: ARM64
           - name: macOS Universal
