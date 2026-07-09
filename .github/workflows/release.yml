@@ -21,9 +21,13 @@ jobs:
         with:
           path: artifacts
 
-      - name: List artifacts
+      - name: Validate artifacts
         run: |
           echo "Artifacts found:"
+          if [ ! -d artifacts ] || [ -z "$(find artifacts -type f -print -quit)" ]; then
+            echo "No artifacts were downloaded. Ensure build artifacts exist for this release/tag."
+            exit 1
+          fi
           find artifacts -type f -exec ls -lh {} \;
 
       - name: Create Release
