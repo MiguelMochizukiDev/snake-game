@@ -4,7 +4,6 @@
 
 # Directories
 BUILD_DIR = build
-DATA_DIR = data
 
 # CMake options
 CMAKE = cmake
@@ -14,6 +13,7 @@ CMAKE_FLAGS = -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE)
 # Docker options
 DOCKER_IMAGE = snake-game
 DOCKER_CONTAINER = snake-game-container
+DOCKER_VOLUME = snake-data
 
 # Executable path
 EXECUTABLE = $(BUILD_DIR)/bin/snake
@@ -66,9 +66,9 @@ docker:
 .PHONY: run-docker
 run-docker: docker
 	@echo "$(GREEN)Running Snake Game in Docker with persistent scores...$(NC)"
-	@mkdir -p $(DATA_DIR)
+	@docker volume create $(DOCKER_VOLUME) 2>/dev/null || true
 	@docker run --rm -it \
-		-v $(PWD)/$(DATA_DIR):/app/data \
+		-v $(DOCKER_VOLUME):/app/data \
 		--name $(DOCKER_CONTAINER) \
 		$(DOCKER_IMAGE)
 
@@ -78,6 +78,12 @@ clean-docker:
 	@docker rm -f $(DOCKER_CONTAINER) 2>/dev/null || true
 	@docker rmi -f $(DOCKER_IMAGE) 2>/dev/null || true
 	@echo "$(YELLOW)Docker clean complete!$(NC)"
+
+.PHONY: clean-volume
+clean-volume:
+	@echo "$(YELLOW)Removing volume...$(NC)"
+	@docker volume rm $(DOCKER_VOLUME) 2>/dev/null || true
+	@echo "$(YELLOW)Volume removed!$(NC)"
 
 .PHONY: rebuild-docker
 rebuild-docker: clean-docker docker
@@ -98,6 +104,7 @@ help:
 	@echo ""
 	@echo "$(BLUE)Docker targets:$(NC)"
 	@echo "  make docker         - Build Docker image"
-	@echo "  make run-docker     - Build and run in Docker (with persistence)"
+	@echo "  make run-docker     - Build and run in Docker (with volume persistence)"
 	@echo "  make clean-docker   - Remove Docker image and containers"
+	@echo "  make clean-volume   - Remove the data volume"
 	@echo "  make rebuild-docker - Clean and rebuild Docker image"
