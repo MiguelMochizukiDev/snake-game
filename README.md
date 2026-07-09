@@ -4,6 +4,7 @@ A terminal-based implementation of the classic Snake game in C++ with persistent
 
 ## Table of Contents
 - [Features](#-features)
+- [Downloads](#-downloads)
 - [Project Structure](#-project-structure)
 - [Prerequisites](#-prerequisites)
 - [Installation](#-installation)
@@ -13,6 +14,7 @@ A terminal-based implementation of the classic Snake game in C++ with persistent
 - [Game Controls](#-game-controls)
 - [Score Management](#-score-management)
 - [Building with CMake](#-building-with-cmake)
+- [CI/CD](#-cicd)
 - [License](#-license)
 - [Author](#-author)
 
@@ -21,10 +23,40 @@ A terminal-based implementation of the classic Snake game in C++ with persistent
 - **Classic Snake Gameplay** - Control a snake to eat food and grow
 - **Score Persistence** - Best score and game history are saved between sessions
 - **Terminal-Based Rendering** - Clean, real-time display using ANSI escape codes
-- **Cross-Platform Support** - Works on Linux, macOS, and Windows (with `conio.h`)
+- **Cross-Platform Support** - Works on Linux, macOS, and Windows
+- **Pre-built Binaries** - Download ready-to-run executables for all platforms
 - **Docker Support** - Containerized deployment with persistent data volumes
 - **Non-Blocking Input** - Smooth gameplay with WASD controls
 - **Game Statistics** - Tracks total games played and average score
+
+## Downloads
+
+Pre-built binaries are available for download from the [Releases](https://github.com/miguelmochizuki/snake-game/releases) page:
+
+| Platform | Architecture | Binary |
+|----------|-------------|--------|
+| Linux | x86-64 | `snake-linux-x86_64` |
+| Linux | ARM64 | `snake-linux-arm64` |
+| Windows | x86-64 | `snake-windows-x86_64.exe` |
+| Windows | ARM64 | `snake-windows-arm64.exe` |
+| macOS | Universal (x86_64 + ARM64) | `snake-macos-universal` |
+
+### Running Downloaded Binaries
+
+**Linux/macOS:**
+```bash
+# Make executable
+chmod +x snake-*
+
+# Run
+./snake-linux-x86_64
+```
+
+**Windows:**
+```cmd
+# Double-click or run from command prompt
+snake-windows-x86_64.exe
+```
 
 ## Project Structure
 
@@ -34,6 +66,10 @@ snake-game/
 ├── Dockerfile              # Multi-stage Docker build
 ├── Makefile                # Build orchestration
 ├── LICENSE                 # MIT License
+├── .github/
+│   └── workflows/
+│       ├── build.yml       # CI build workflow
+│       └── release.yml     # Automatic release workflow
 ├── data/                   # Score persistence directory
 │   ├── best_score.txt     # Best score storage
 │   └── score_history.txt  # All scores history
@@ -152,6 +188,9 @@ make run-local
 
 # Docker
 make run-docker
+
+# Downloaded binary
+./snake-<platform>
 ```
 
 ### Game Controls
@@ -228,6 +267,37 @@ The Dockerfile uses a multi-stage build for minimal image size:
 - Runs as non-root user (`snakeuser`)
 - Minimal Alpine base image
 - Only necessary runtime dependencies
+
+## CI/CD
+
+The project uses GitHub Actions for continuous integration and delivery:
+
+### Build Workflow
+Automatically builds binaries for all supported platforms on every push to `main` and `dev`:
+- Linux x86-64
+- Linux ARM64
+- Windows x86-64
+- Windows ARM64
+- macOS Universal
+
+### Release Workflow
+When a tag matching `v*` is pushed, the release workflow automatically:
+1. Downloads all build artifacts
+2. Creates a GitHub Release
+3. Attaches the binaries directly to the release (no ZIP files)
+
+### Creating a New Release
+```bash
+# Ensure all changes are merged to main
+git checkout main
+git pull origin main
+
+# Create and push a version tag
+git tag -a v1.0.0 -m "Release v1.0.0"
+git push origin v1.0.0
+```
+
+The release will be automatically created with all binaries attached.
 
 ## 📄 License
 

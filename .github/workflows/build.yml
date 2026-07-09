@@ -23,29 +23,34 @@ jobs:
             runs-on: ubuntu-24.04
             artifact-name: snake-linux-x86_64
             binary-path: build/bin/snake
+            final-name: snake-linux-x86_64
             cmake-generator: Ninja
           - name: Linux ARM64
             runs-on: ubuntu-24.04
             artifact-name: snake-linux-arm64
             binary-path: build/bin/snake
+            final-name: snake-linux-arm64
             cmake-generator: Ninja
             toolchain: linux-arm64
           - name: Windows x86-64
             runs-on: windows-2022
             artifact-name: snake-windows-x86_64
             binary-path: build/bin/Release/snake.exe
+            final-name: snake-windows-x86_64.exe
             cmake-generator: Visual Studio 17 2022
             cmake-arch: x64
           - name: Windows ARM64
             runs-on: windows-2022
             artifact-name: snake-windows-arm64
             binary-path: build/bin/Release/snake.exe
+            final-name: snake-windows-arm64.exe
             cmake-generator: Visual Studio 17 2022
             cmake-arch: ARM64
           - name: macOS Universal
             runs-on: macos-14
             artifact-name: snake-macos-universal
             binary-path: build/bin/snake
+            final-name: snake-macos-universal
             cmake-generator: Ninja
             osx-architectures: "x86_64;arm64"
 
@@ -102,9 +107,19 @@ jobs:
       - name: Build
         run: cmake --build build --config Release --parallel
 
+      - name: Rename binary
+        shell: bash
+        run: |
+          if [ -f "${{ matrix.binary-path }}" ]; then
+            cp "${{ matrix.binary-path }}" "${{ matrix.final-name }}"
+          else
+            echo "Binary not found at ${{ matrix.binary-path }}"
+            exit 1
+          fi
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}
-          path: ${{ matrix.binary-path }}
+          path: ${{ matrix.final-name }}
           if-no-files-found: error
