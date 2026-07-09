@@ -57,6 +57,11 @@ jobs:
         if: matrix.cmake-generator == 'Ninja'
         uses: seanmiddleditch/gha-setup-ninja@v5
 
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install ninja
+
       - name: Set up Linux ARM64 toolchain
         if: matrix.toolchain == 'linux-arm64'
         run: |
