@@ -101,6 +101,11 @@ public:
 	void resetDirectionChanged();
 
 	/**
+	 * Resets quit flag to true when restarting the game
+	 */
+	void resetQuit();
+
+	/**
 	 * Checks if quit was pressed
 	 *
 	 * Returns bool: true if 'q' was pressed

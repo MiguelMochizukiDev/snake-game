@@ -89,6 +89,7 @@ void GameEngine::run() {
 		direction_ = Direction::RIGHT;
 		running_ = true;
 		inputHandler_.resetDirectionChanged();
+		inputHandler_.resetQuit();
 		run();
 	}
 }

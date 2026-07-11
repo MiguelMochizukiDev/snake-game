@@ -175,6 +175,13 @@ void WASDInputHandler::restoreTerminal() {
 }
 
 /**
+ * Resets quit flag to true when restarting the game
+ */
+void WASDInputHandler::resetQuit() {
+	state_.quit = false;
+}
+
+/**
  * Sets up terminal for raw input mode (Unix only)
  */
 void WASDInputHandler::setupTerminal() {
