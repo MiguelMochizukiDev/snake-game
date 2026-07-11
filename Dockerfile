@@ -6,7 +6,8 @@
 # Stage 1: Builder
 # ==============================
 
-FROM alpine:latest AS builder
+ARG TARGETPLATFORM
+FROM --platform=$TARGETPLATFORM alpine:latest AS builder
 
 # Install build dependencies
 RUN apk add --no-cache \
@@ -33,7 +34,8 @@ RUN mkdir -p build && \
 # Stage 2: Runtime
 # ==============================
 
-FROM alpine:latest
+ARG TARGETPLATFORM
+FROM --platform=$TARGETPLATFORM alpine:latest
 
 # Install runtime dependencies
 RUN apk add --no-cache \
