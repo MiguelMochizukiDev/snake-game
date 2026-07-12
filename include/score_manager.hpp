@@ -12,6 +12,7 @@
 #include <iostream>
 #include <algorithm>
 #include <ctime>
+#include <cstdint>
 
 /**
  * Manages score persistence including best score and score history
@@ -20,16 +21,20 @@
  * std::string dataDir_: Directory for storing score files
  * std::string historyFile_: Path to score history file
  * std::string bestFile_: Path to best score file
+ * std::string checksumFile_: Path to integrity checksum file
  * int bestScore_: Current best score
  * std::vector<int> scoreHistory_: History of all scores
+ * uint64_t checksum_: Stored integrity checksum
  */
 class ScoreManager {
 private:
 	std::string dataDir_;
 	std::string historyFile_;
 	std::string bestFile_;
+	std::string checksumFile_;
 	int bestScore_;
 	std::vector<int> scoreHistory_;
+	uint64_t checksum_;
 
 	/**
 	 * Creates data directory if it doesn't exist
@@ -45,6 +50,33 @@ private:
 	 * Loads score history from file
 	 */
 	void loadHistory();
+
+	/**
+	 * Computes integrity checksum from in-memory scores
+	 */
+	uint64_t computeChecksum() const;
+
+	/**
+	 * Loads stored checksum from file
+	 *
+	 * Returns bool: true if checksum file existed and was read
+	 */
+	bool loadChecksum();
+
+	/**
+	 * Writes integrity checksum to file
+	 */
+	void writeChecksum();
+
+	/**
+	 * Resets all scores to zero, keeping play count. Rewrites both score files.
+	 */
+	void resetScoresToZero();
+
+	/**
+	 * Clears all history entirely. Rewrites both score files from scratch.
+	 */
+	void clearAllHistory();
 
 public:
 	/**

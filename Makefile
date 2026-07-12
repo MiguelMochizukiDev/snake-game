@@ -4,6 +4,7 @@
 
 # Directories
 BUILD_DIR = build
+DATA_DIR = data
 
 # CMake options
 CMAKE = cmake
@@ -56,6 +57,12 @@ clean-local:
 	@rm -rf $(BUILD_DIR)
 	@echo "$(YELLOW)Clean complete!$(NC)"
 
+.PHONY: clean-local-data
+clean-local-data:
+	@echo "$(YELLOW)Removing local data...$(NC)"
+	@rm -rf $(DATA_DIR)
+	@echo "$(YELLOW)Local data removed!$(NC)"
+
 .PHONY: rebuild-local
 rebuild-local: clean-local local
 
@@ -90,11 +97,11 @@ clean-docker:
 	@rm -f $(DOCKER_CACHE)
 	@echo "$(YELLOW)Docker clean complete!$(NC)"
 
-.PHONY: clean-volume
-clean-volume:
-	@echo "$(YELLOW)Removing volume...$(NC)"
+.PHONY: clean-docker-data
+clean-docker-data:
+	@echo "$(YELLOW)Removing Docker data volume...$(NC)"
 	@docker volume rm $(DOCKER_VOLUME) 2>/dev/null || true
-	@echo "$(YELLOW)Volume removed!$(NC)"
+	@echo "$(YELLOW)Docker data volume removed!$(NC)"
 
 .PHONY: rebuild-docker
 rebuild-docker: clean-docker docker
@@ -111,11 +118,12 @@ help:
 	@echo "  make local          - Build the game locally (only if changed)"
 	@echo "  make run-local      - Build and run the game locally (only if changed)"
 	@echo "  make clean-local    - Remove build files"
+	@echo "  make clean-local-data - Remove local data files"
 	@echo "  make rebuild-local  - Clean and rebuild locally"
 	@echo ""
 	@echo "$(BLUE)Docker targets:$(NC)"
 	@echo "  make docker         - Build Docker image (only if changed)"
 	@echo "  make run-docker     - Build and run in Docker (only if changed)"
 	@echo "  make clean-docker   - Remove Docker image, container and cache"
-	@echo "  make clean-volume   - Remove the data volume"
+	@echo "  make clean-docker-data - Remove Docker data volume"
 	@echo "  make rebuild-docker - Clean and rebuild Docker image"

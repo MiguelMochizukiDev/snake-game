@@ -18,14 +18,25 @@
 /**
  * Constructor for the ScoreManager class
  */
-ScoreManager::ScoreManager() : bestScore_(0) {
+ScoreManager::ScoreManager() : bestScore_(0), checksum_(0) {
 	dataDir_ = "data";
 	historyFile_ = dataDir_ + "/score_history.txt";
 	bestFile_ = dataDir_ + "/best_score.txt";
+	checksumFile_ = dataDir_ + "/score_checksum.txt";
 
 	createDataDirectory();
 	loadBestScore();
 	loadHistory();
+
+	uint64_t computed = computeChecksum();
+	bool checksumExists = loadChecksum();
+
+	if (!checksumExists) {
+		clearAllHistory();
+	} else if (computed != checksum_) {
+		resetScoresToZero();
+		writeChecksum();
+	}
 }
 
 /**
@@ -140,4 +151,95 @@ void ScoreManager::saveScore(int score) {
 		historyFile << score << "\n";
 		historyFile.close();
 	}
+
+	writeChecksum();
+}
+
+/**
+ * Computes integrity checksum from in-memory scores
+ *
+ * Returns uint64_t: Simple hash of bestScore_ and all scoreHistory_ entries
+ */
+uint64_t ScoreManager::computeChecksum() const {
+	uint64_t hash = 0x9E3779B97F4A7C15ULL;
+	hash ^= static_cast<uint64_t>(bestScore_) + 0x9E3779B97F4A7C15ULL + (hash << 6) + (hash >> 2);
+	for (int score : scoreHistory_) {
+		hash ^= static_cast<uint64_t>(score) + 0x9E3779B97F4A7C15ULL + (hash << 6) + (hash >> 2);
+	}
+	return hash;
+}
+
+/**
+ * Loads stored checksum from file
+ *
+ * Returns bool: true if checksum file existed and was read
+ */
+bool ScoreManager::loadChecksum() {
+	std::ifstream file(checksumFile_);
+	if (file.is_open()) {
+		file >> checksum_;
+		file.close();
+		return true;
+	}
+	checksum_ = 0;
+	return false;
+}
+
+/**
+ * Writes integrity checksum to file
+ */
+void ScoreManager::writeChecksum() {
+	checksum_ = computeChecksum();
+	std::ofstream file(checksumFile_);
+	if (file.is_open()) {
+		file << checksum_ << "\n";
+		file.close();
+	}
+}
+
+/**
+ * Resets all scores to zero, keeping play count. Rewrites both score files.
+ */
+void ScoreManager::resetScoresToZero() {
+	bestScore_ = 0;
+	for (auto& score : scoreHistory_) {
+		score = 0;
+	}
+
+	std::ofstream bestFile(bestFile_);
+	if (bestFile.is_open()) {
+		bestFile << bestScore_ << "\n";
+		bestFile.close();
+	}
+
+	std::ofstream historyFile(historyFile_);
+	if (historyFile.is_open()) {
+		for (auto score : scoreHistory_) {
+			historyFile << score << "\n";
+		}
+		historyFile.close();
+	}
+
+	writeChecksum();
+}
+
+/**
+ * Clears all history entirely. Rewrites both score files from scratch.
+ */
+void ScoreManager::clearAllHistory() {
+	bestScore_ = 0;
+	scoreHistory_.clear();
+
+	std::ofstream bestFile(bestFile_);
+	if (bestFile.is_open()) {
+		bestFile << bestScore_ << "\n";
+		bestFile.close();
+	}
+
+	std::ofstream historyFile(historyFile_);
+	if (historyFile.is_open()) {
+		historyFile.close();
+	}
+
+	writeChecksum();
 }
